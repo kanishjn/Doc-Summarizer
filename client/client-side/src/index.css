@@ -1,0 +1,204 @@
+
+.inputContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.mainInput {
+  width: 70%;
+  min-width: 250px;
+  height: 100px;
+  border-radius: 20px;
+  border: none;
+  color: white;
+  background-color: rgb(186, 176, 176);
+  outline: none;
+  padding: 10px 8rem 10px 10px;
+  font-size: 1.3rem;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.buttonDiv {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  margin-left: -120px;
+}
+.fileUploadWrapper,
+.submitButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+}
+
+.fileUpload{
+    position: relative;
+    right: 3%;
+    border-radius:30px ;
+    width: 40px;
+    height: 40px;
+    opacity: 0;
+}
+.fileUploadWrapper {
+  background-image: url('./assets/image.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-color: white;
+  border: 1px solid black;
+  cursor: pointer;
+}
+.submitButton {
+  background-color: black;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.chatWindow{
+    width: 97%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20%;
+    background-color: white;
+    border-radius: 20px;
+    scroll-behavior: smooth;
+
+}
+.messageBubble{
+    max-width: 80%;
+    padding: 12px 16px;
+    margin: 10px;
+    border-radius: 16px;
+    line-height: 1.4;
+}
+
+#ai{
+    background-color: rgb(97, 94, 94);
+    color: rgb(255, 255, 255);
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+#user{
+    background-color: rgb(189, 182, 182);
+    color: black;
+    align-self: flex-start;
+    border-bottom-left-radius: 0; 
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+.response{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.headerDiv{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    width: 98%;
+    background-color: rgb(186, 176, 176);
+    border-radius: 20px;
+}
+
+.logoDiv{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding-left: 2%;
+}
+
+.logoDiv img{
+    width: 40px;
+    height: auto;
+}
+.logoDiv p{
+    font-family: monospace;
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+}
+
+.links{
+    padding-right: 2%;
+}
+
+.gitLink img,
+.linkedinLink img {
+    width: 50px;
+    height: auto;
+    margin: 0 5px;
+}
+
+.previewDiv{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.previewDiv img{
+    width: 2rem;
+    height: auto;
+}
+.previewDiv button{
+  background-color: #f1f1f1;
+    border: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 2rem;
+    cursor: pointer;
+}
+
+@media(max-width: 768px){
+    .gitLink img,
+.linkedinLink img {
+    width: 25px;
+    height: auto;
+    margin-left: 1%;
+}
+.logoDiv img{
+    width: 20px;
+    height: auto;
+}
+.logoDiv p{
+    font-size: 0.7rem;   
+}
+.headerDiv h2{
+    font-size: 1rem;
+}
+.mainInput{
+    width: 80%;  
+}
+.previewDiv{
+    font-size: 0.8rem;
+}
+.previewDiv img{
+    width: 1.5rem;
+}
+.previewDiv button{
+    width: 1rem;
+    height: 1rem;
+    border-radius: 1rem;
+}
+.messageBubble{
+    width: 60%;
+    margin: 7px;
+}
+#ai, #user{
+    font-size: 1rem;
+}
+.headerDiv{
+   border-radius:0;
+
+}
+}

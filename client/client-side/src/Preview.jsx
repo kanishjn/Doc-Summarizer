@@ -13,7 +13,7 @@ function Preview({ file, clearFile }) {
   }
   return (
     <div className="previewDiv">
-      <img alt="Thumbnail" src="./src/assets/file-icon.png" /> 
+      <img alt="Thumbnail" src="https://th.bing.com/th/id/OIP.wYlyKcT2kYHALFkxd8A0BwHaHa?cb=iwp2&rs=1&pid=ImgDetMain" /> 
       <p className="fileName">{file.name}</p>
       <p className="fileSize">({formatFileSize(file.size)})</p>
       <button onClick={removeFile}>❌</button>

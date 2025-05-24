@@ -7,7 +7,7 @@ function Header(){
             </div>
             <h2>AI-powered summarization</h2>
             <div className="links">
-                <a className="gitLink"href="https://github.com/kanishjn/document-summarizer-ai"><img src="https://pngimg.com/uploads/github/github_PNG80.png" alt="Github Repo"></img></a>
+                <a className="gitLink"href="https://github.com/kanishjn/Doc-Summarizer"><img src="https://pngimg.com/uploads/github/github_PNG80.png" alt="Github Repo"></img></a>
                 <a className="linkedinLink"href="https://www.linkedin.com/in/kanish-jain-1b83902ab/" alt="My Linkedin"><img src="https://freelogopng.com/images/all_img/1656994981linkedin-icon-png.png"></img></a>
             </div>
         </div>

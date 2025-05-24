@@ -32,7 +32,7 @@ function Input(){
       const formData = new FormData();
       formData.append("document", file);
 
-      const response = await axios.post("http://localhost:5000/upload", formData, {
+      const response = await axios.post("https://doc-summarizer-3.onrender.com/upload", formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -59,7 +59,7 @@ function Input(){
       setMessages(m => [...m, { sender: "user", text: trimmedPrompt }]);
       setPrompt("");
       try{
-        aiResponse = await axios.post("http://localhost:5000/ask",{question: trimmedPrompt}, {
+        aiResponse = await axios.post("https://doc-summarizer-3.onrender.com/ask",{question: trimmedPrompt}, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
       }});

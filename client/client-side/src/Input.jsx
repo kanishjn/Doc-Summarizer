@@ -59,7 +59,7 @@ function Input(){
       setMessages(m => [...m, { sender: "user", text: trimmedPrompt }]);
       setPrompt("");
       try{
-        aiResponse = await axios.post ("http://localhost:5000/ask",{question: trimmedPrompt}, {
+        aiResponse = await axios.post("http://localhost:5000/ask",{question: trimmedPrompt}, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
       }});

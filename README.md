@@ -1,2 +1,2 @@
 # document-summarizer-ai
-A web app that summarizes documents using DeepSeek’s API
+A web app that summarizes documents using Gemini’s API

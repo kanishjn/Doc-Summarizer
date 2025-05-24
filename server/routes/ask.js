@@ -23,7 +23,6 @@ router.post('/', async (req, res) => {
 
         // Handle FastAPI response
         const fastApiData = fastApiResponse.data;
-        console.log(`Response from ask:`, fastApiData);
         
         if (fastApiData.error) {
             return res.status(400).json({
@@ -42,8 +41,6 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.error('Error forwarding question to FastAPI:', {
     message: error.message,
-    status: error.response?.status,
-    data: error.response?.data
 });
 
 res.status(500).json({

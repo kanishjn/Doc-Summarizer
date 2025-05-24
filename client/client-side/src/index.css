@@ -206,6 +206,7 @@
     .previewDiv{
         width: 20rem;
         font-size: 0.5rem;
+        gap: 3px;
 }
 .previewDiv img{
     width: 1rem;

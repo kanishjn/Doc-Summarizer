@@ -7,6 +7,8 @@ function ChatWindow({ messages }) {
   useEffect(() => {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
+      //scrollTop is a property representing how far the content inside the element is scrolled vertically — basically, how far the scrollbar is from the top.
+      //scrollHeight is the total height of the content inside the element — including the part you can't see without scrolling.
     }
   }, [messages]);
 

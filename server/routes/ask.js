@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
         formData.append('question', question);
 
         // Forward to FastAPI
-        const fastApiResponse = await axios.post('http://127.0.0.1:8000/ask', formData, {
+        const fastApiResponse = await axios.post('https://doc-summarizer-kmc0.onrender.com/ask', formData, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },

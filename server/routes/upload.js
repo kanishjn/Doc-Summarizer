@@ -45,7 +45,7 @@ router.post('/', upload.single('document'), async (req, res)=>{
         contentType: req.file.mimetype
       });
 
-      const fastApiResponse = await axios.post("http://127.0.0.1:8000/upload", formData, {//with axios I don't have to mount post request to a router
+      const fastApiResponse = await axios.post("https://doc-summarizer-kmc0.onrender.com/upload", formData, {//with axios I don't have to mount post request to a router
         headers:{
           ...formData.getHeaders()
         }

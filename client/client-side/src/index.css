@@ -202,3 +202,12 @@
 
 }
 }
+@media(max-width: 560px){
+    .previewDiv{
+        width: 20rem;
+        font-size: 0.5rem;
+}
+.previewDiv img{
+    width: 1rem;
+}
+}

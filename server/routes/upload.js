@@ -16,13 +16,13 @@ function formatFileSize(bytes) {
 const router = express.Router();
 
 const storage = multer.diskStorage({
-    destination: function(req, file, callback){
+    destination: function(_, _, callback){
         const uploadPath = path.join(__dirname,'..uploads');
         if(!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath)
         callback(null, uploadPath);//callback: This is a callback function that you must call to tell Multer the destination. Its signature is cb(error, destination_path).
         //If there's an error, you'd call cb(error).
         //If successful, you call cb(null, destination_path).
-    }, filename:function(req, file, callback){
+    }, filename:function(_, file, callback){
         callback(null, `${Date.now()}-${file.originalname}`)
     }
 });//takes an object with two keys destination and filename
@@ -45,7 +45,7 @@ router.post('/', upload.single('document'), async (req, res)=>{
         contentType: req.file.mimetype
       });
 
-      const fastApiResponse = await axios.post("https://doc-summarizer-kmc0.onrender.com/upload", formData, {//with axios I don't have to mount post request to a router
+      const fastApiResponse = await axios.post("http://127.0.0.1:8000/upload", formData, {//with axios I don't have to mount post request to a router
         headers:{
           ...formData.getHeaders()
         }

@@ -41,7 +41,7 @@ def register(email: str = Form(...), password: str = Form(...)):
     db = get_db()
     cursor = db.cursor()#works as an iterator
 
-    cursor.execute("SELECT * FROM Users WHERE email = %s", (email,))#we don't store because because we are not retrieving (it keeps the result to server itself)
+    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))#we don't store because because we are not retrieving (it keeps the result to server itself)
     if cursor.fetchone():#after the select query fetchone tries to retrieve a row from the query result set
         raise HTTPException(status_code=400, message="User already exists")
     

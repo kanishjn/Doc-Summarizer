@@ -17,6 +17,8 @@ print("Loaded Key:", GEMINI_API_KEY)
 app = FastAPI()
 timeout_config = httpx.Timeout(30.0) 
 
+print("Connecting to:", os.getenv("DB_HOST"), os.getenv("DB_NAME"),os.getenv("DB_USER"),os.getenv("DB_PORT"))
+
 def get_db():
     return mysql.connector.connect(
     host=os.getenv("DB_HOST"),

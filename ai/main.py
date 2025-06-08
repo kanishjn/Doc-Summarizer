@@ -44,7 +44,7 @@ def register(email: str = Form(...), password: str = Form(...)):
         raise HTTPException(status_code=400, message="User already exists")
     
     else:
-        cursor.execute("INSERT INTO Users (email, password) VALUES (%s, %s)",(email,password))
+        cursor.execute("INSERT INTO users (email, password) VALUES (%s, %s)",(email,password))
         db.commit()
         return {"message": "User registered successfully"}
 
@@ -53,7 +53,7 @@ def login(email: str = Form(...), password: str = Form(...)):
     db = get_db()
     cursor = db.cursor()
     print(type(email), type(password))
-    cursor.execute("SELECT id FROM Users WHERE email = %s AND password = %s", (str(email), str(password)))
+    cursor.execute("SELECT id FROM users WHERE email = %s AND password = %s", (str(email), str(password)))
     result = cursor.fetchone()
     if result:
         return {"message": "Login successful", "user_id": result[0]}
@@ -98,7 +98,7 @@ async def upload_doc(file: UploadFile = File(...), user_id: int = Form(...)):
     
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("INSERT INTO Contexts (user_id, context) VALUES (%s, %s)", (user_id, text))
+    cursor.execute("INSERT INTO contexts (user_id, context) VALUES (%s, %s)", (user_id, text))
     db.commit()
     return {"message": "Document uploaded and stored."}
 
@@ -114,7 +114,7 @@ async def ask_question(q:Question):
      db = get_db()
      cursor = db.cursor()
      cursor.execute(
-        "SELECT id, context FROM Contexts WHERE user_id = %s ORDER BY id DESC LIMIT 1", 
+        "SELECT id, context FROM contexts WHERE user_id = %s ORDER BY id DESC LIMIT 1", 
         (user_id,)#just user_id send it as a single integer but with comma it becomes a tuple and MySQL expects parameters to be in a list, tuple, or dictionary format.
     )
      
@@ -122,7 +122,7 @@ async def ask_question(q:Question):
      if not context:
         return {"error": "No document uploaded yet."}
      
-     cursor.execute(" SELECT sender, text FROM Messages WHERE user_id = %s ORDER BY timestamp DESC LIMIT 6", (user_id,))
+     cursor.execute(" SELECT sender, text FROM messages WHERE user_id = %s ORDER BY timestamp DESC LIMIT 6", (user_id,))
      rows = cursor.fetchall()
      bubbles = []
      current = {}
@@ -169,8 +169,8 @@ async def ask_question(q:Question):
                 return {"error": "Failed to summarize", "details": response.text}
             res_json = response.json()
             answer_text = res_json.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No answer available")
-            cursor.execute("INSERT INTO Messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, question, "user"))
-            cursor.execute("INSERT INTO Messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, answer_text, "ai"))
+            cursor.execute("INSERT INTO messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, question, "user"))
+            cursor.execute("INSERT INTO messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, answer_text, "ai"))
             db.commit()
 
             return {"answer": answer_text}

@@ -1,0 +1,179 @@
+/* URL Field Styles */
+.urlField {
+  width: 40%;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border: 2px solid #ccc;
+  border-radius: 15px;
+  background-color: #ffffff;
+  color: #333;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  outline: none;
+  position: relative;
+  
+}
+
+
+
+.urlField:hover:not(:focus) {
+  border-color: #999;
+}
+.urlField:focus {
+border-color: rgba(99, 102, 241, 0.5);
+box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 8px 30px rgba(0, 0, 0, 0.15);
+transform: translateY(-2px);
+}
+.urlField::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+.inputDiv{
+  width: 100vw;
+  position: relative;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 10px;
+margin-left: -250px ;
+}
+
+.buttonDivYT{
+  display: flex;
+flex-direction: row;
+justify-content: center;
+gap: 10px;
+align-items: center;
+z-index: 1;
+margin-left:-380px;
+margin-top:60px
+}
+
+
+/* YouTube Button */
+.YTOpener {
+  background: linear-gradient(135deg, #FF0000, #DC143C);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  width: 3.1rem;
+  height: 2.4rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.YTOpener::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 14px solid white;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  margin-left: 3px;
+}
+
+.YTOpener:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+}
+
+.YTOpener:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3);
+}
+
+.YTOpener:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+}
+
+@media(min-width: 920px) and (max-width: 1300px) {
+  
+.buttonDivYT {
+gap: 10px;
+margin-left: -290px;
+}
+.inputDiv{
+margin-left: -100px ;
+}
+}
+@media(min-width: 768px) and (max-width: 920px) {
+  
+.buttonDivYT {
+gap: 10px;
+margin-left: -260px;
+}
+.inputDiv{
+margin-left: -100px ;
+}
+}
+@media(min-width: 564px) and (max-width: 768px) {
+  
+.buttonDivYT {
+gap: 10px;
+margin-left: -200px;
+}
+.inputDiv{
+margin-left: -100px ;
+}
+}
+@media(min-width: 480px) and (max-width: 564px) {
+  
+.buttonDivYT {
+gap: 10px;
+margin-left: -160px;
+}
+.inputDiv{
+margin-left: -80px ;
+}
+.YTOpener {
+    width: 2.5rem;
+  height: 1.8rem;
+  border-radius: 9px;
+  font-size: 1.2rem;
+}
+}
+@media(min-width: 400px) and (max-width: 480px) {
+  
+.buttonDivYT {
+gap: 10px;
+margin-left: -170px;
+}
+.inputDiv{
+margin-left: -80px ;
+}
+.YTOpener {
+    width: 2.5rem;
+  height: 1.8rem;
+  border-radius: 9px;
+  font-size: 1.2rem;
+}
+.urlField::placeholder{
+  font-size: 16px;
+}
+}
+@media(min-width: 300px) and (max-width: 400px) {
+  
+.buttonDivYT {
+gap: 10px;
+margin-left: -160px;
+}
+.inputDiv{
+margin-left: -80px ;
+}
+.YTOpener {
+    width: 2.5rem;
+  height: 1.8rem;
+  border-radius: 9px;
+  font-size: 1.2rem;
+}
+.urlField::placeholder{
+  font-size: 14px;
+}
+}

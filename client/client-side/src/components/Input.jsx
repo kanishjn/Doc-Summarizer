@@ -96,7 +96,13 @@ function Input(){
       <ChatWindow messages={messages}/>
       <Preview file={file} clearFile={() => setFile(null)}/>
       <form className="inputContainer" onSubmit={(e)=> handleSubmit(e)}>
-  <textarea className="mainInput" value={prompt} placeholder="Upload a document and ask anything" onChange={(e)=> changePrompt(e)}></textarea>
+  <textarea className="mainInput" value={prompt} placeholder="Upload a document and ask anything" onChange={(e)=> changePrompt(e)} 
+    onKeyDown={(e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); 
+      handleSubmit(e);
+    }
+  }}></textarea>
   <div className="buttonDiv">
     <div className="fileUploadWrapper">
     <input type="file" onChange={(e) => handleFileUpload(e)} className="fileUpload"></input>

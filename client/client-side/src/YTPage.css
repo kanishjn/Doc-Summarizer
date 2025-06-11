@@ -1,4 +1,3 @@
-/* URL Field Styles */
 .urlField {
   width: 40%;
   padding: 14px 20px;
@@ -14,9 +13,6 @@
   position: relative;
   
 }
-
-
-
 .urlField:hover:not(:focus) {
   border-color: #999;
 }
@@ -51,7 +47,6 @@ margin-top:60px
 }
 
 
-/* YouTube Button */
 .YTOpener {
   background: linear-gradient(135deg, #FF0000, #DC143C);
   display: flex;

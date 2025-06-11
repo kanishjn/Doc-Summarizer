@@ -107,7 +107,12 @@ function YTSummarizer(){
             <div className="inputDiv">
                 <input type="text" className='urlField' placeholder="Enter YouTube URL" value={currentUrl} onChange={(e)=>handleUrlUpload(e)}onFocus={(e) => (e.target.style.borderColor = "#007BFF")}onBlur={(e) => (e.target.style.borderColor = "#ccc")}></input>
 
-        <textarea className="mainInput" onChange={(e)=>handlePromptUpload(e)} value={prompt} placeholder='Ask Anything'></textarea>
+        <textarea className="mainInput" onChange={(e)=>handlePromptUpload(e)} value={prompt} placeholder='Ask Anything' onKeyDown={(e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); 
+      handleSubmit(e);
+    }
+  }}></textarea>
           </div>
         <div className="buttonDivYT">
         <button type="button" title="Open on YouTube" className='YTOpener' onClick={goToUrl}></button>

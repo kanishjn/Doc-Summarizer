@@ -28,7 +28,7 @@ function HomePage(){
         "Multi-language support"
       ],
       redirectUrl: "/ytsummarizer"
-    }
+    },
   ];
 
   return(

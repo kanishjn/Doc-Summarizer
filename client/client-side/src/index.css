@@ -797,6 +797,10 @@ gap: 10px;
   font-size: 1rem;
   margin-top: 0.75rem;
 }
+
+.HomePageDiv{
+height: fit-content;
+}
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
@@ -815,4 +819,3 @@ gap: 10px;
   font-size: 1.9rem;
 }
 }
-

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from fastapi import Form
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound, VideoUnavailable
 import os
+import re
 import httpx
 from fastapi.middleware.cors import CORSMiddleware
 from io import BytesIO
@@ -108,9 +109,32 @@ def format_timestamp(seconds):
     secs = int(seconds % 60)
     return f"{minutes:02}:{secs:02}"
 
+def extract_video_id(video_url: str) -> str:
+    """
+    Robust video ID extraction from various YouTube URL formats
+    """
+    patterns = [
+        r'(?:v=|\/)([0-9A-Za-z_-]{11}).*',
+        r'(?:embed\/)([0-9A-Za-z_-]{11})',
+        r'(?:v\/|youtu\.be\/)([0-9A-Za-z_-]{11})',
+        r'(?:watch\?v=)([0-9A-Za-z_-]{11})',
+        r'(?:youtube\.com\/.*v=)([0-9A-Za-z_-]{11})'
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, video_url)
+        if match:
+            return match.group(1)
+    
+    # If no pattern matches, try simple split (your original method as fallback)
+    try:
+        return video_url.split("?v=")[-1].split("&")[0]
+    except:
+        raise ValueError("Invalid YouTube URL format")
+    
 @app.post("/yt_upload")
 async def ytUpload(video_url: str = Form(...), user_id: int = Form(...)):
-    video_id = video_url.split("?v=")[-1].split("&")[0]
+    video_id = extract_video_id(video_url)
     try:
         transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
     except TranscriptsDisabled:

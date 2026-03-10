@@ -1,7 +1,17 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from dotenv import load_dotenv
 from fastapi import Form
-from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound, VideoUnavailable
+
+# Try optional import for youtube transcripts. If missing, the server can still start
+# but the /yt_upload endpoint will return a clear HTTP error asking to install it.
+try:
+    from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound, VideoUnavailable
+    YT_AVAILABLE = True
+except ModuleNotFoundError:
+    YouTubeTranscriptApi = None
+    # use generic Exception placeholders so exception clauses remain valid
+    TranscriptsDisabled = NoTranscriptFound = VideoUnavailable = Exception
+    YT_AVAILABLE = False
 import os
 import re
 import httpx
@@ -15,6 +25,7 @@ from docx import Document  # for DOCX
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")  # This fetches the key from env
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 app = FastAPI()
 timeout_config = httpx.Timeout(30.0) 
 
@@ -134,6 +145,9 @@ def extract_video_id(video_url: str) -> str:
     
 @app.post("/yt_upload")
 async def ytUpload(video_url: str = Form(...), user_id: int = Form(...)):
+    if not YT_AVAILABLE:
+        raise HTTPException(status_code=500, detail=("Missing Python package 'youtube_transcript_api'. "
+                                                    "Activate the venv and run: pip install youtube-transcript-api"))
     video_id = extract_video_id(video_url)
     try:
         transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
@@ -162,120 +176,143 @@ class Question(BaseModel):
     user_id:int
 
 @app.post("/yt_ask")
-async def ytAsk(q:Question):
-     question = q.question
-     user_id = q.user_id
-     db = get_db()
-     cursor = db.cursor()
-     cursor.execute("SELECT context FROM yt_contexts WHERE user_id = %s ORDER BY id DESC LIMIT 1", (user_id,))
-     context = cursor.fetchone()
-     if not context:
+async def ytAsk(q: Question):
+    question = q.question
+    user_id = q.user_id
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT context FROM yt_contexts WHERE user_id = %s ORDER BY id DESC LIMIT 1",
+        (user_id,),
+    )
+    context = cursor.fetchone()
+    if not context:
         return {"error": "No url uploaded yet."}
-     
-     prompt = (
+
+    prompt = (
         "You are an assistant helping with YouTube video transcripts.\n"
         "Each line in the transcript includes a timestamp like [04:21].\n\n"
-        "Transcript:\n"f"{context}\n\n"
+        "Transcript:\n" f"{context}\n\n"
         "Question:\n" f"{question}\n\n"
-        "If your answer refers to any moment in the video, include the timestamp in square brackets.")
+        "If your answer refers to any moment in the video, include the timestamp in square brackets."
+    )
 
-     data ={
-         "contents":[
-             {
-                 "parts":[
-                     {"text": prompt}
-                 ]
-             }
-         ]
-     }
-     
-     headers = {"Content-Type": "application/json"}
-     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-     
-     async with httpx.AsyncClient(timeout=timeout_config) as client:
-            try:
-                response = await client.post(url, headers=headers, json=data)
-            except httpx.RequestError as exc:
-                return {"error": f"Request failed: {exc}"}
-            except httpx.TimeoutException:
-                return {"error": "The request timed out. Please try again."}
-            if response.status_code != 200:
-                return {"error": "Failed to summarize", "details": response.text}
-            res_json = response.json()
-            answer_text = res_json.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No answer available")
-            cursor.execute("INSERT INTO yt_messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, question, "user"))
-            cursor.execute("INSERT INTO yt_messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, answer_text, "ai"))
-            db.commit()
-            return {"answer": answer_text}
+    data = {
+        "contents": [
+            {"parts": [{"text": prompt}]}
+        ]
+    }
+
+    headers = {"Content-Type": "application/json"}
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+
+    async with httpx.AsyncClient(timeout=timeout_config) as client:
+        try:
+            response = await client.post(url, headers=headers, json=data)
+        except httpx.RequestError as exc:
+            raise HTTPException(status_code=500, detail=f"Request failed: {exc}")
+        except httpx.TimeoutException:
+            raise HTTPException(status_code=504, detail="The request timed out. Please try again.")
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail={"Failed to summarize": response.text})
+
+        res_json = response.json()
+        answer_text = (
+            res_json
+            .get("candidates", [{}])[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("text", "No answer available")
+        )
+
+        cursor.execute(
+            "INSERT INTO yt_messages (user_id, text, sender) VALUES (%s, %s, %s)",
+            (user_id, question, "user"),
+        )
+        cursor.execute(
+            "INSERT INTO yt_messages (user_id, text, sender) VALUES (%s, %s, %s)",
+            (user_id, answer_text, "ai"),
+        )
+        db.commit()
+        return {"answer": answer_text}
 
 
     
 @app.post("/ask")
 async def ask_question(q:Question):
-     question = q.question
-     user_id = q.user_id
-     
-     db = get_db()
-     cursor = db.cursor()
-     cursor.execute(
-        "SELECT id, context FROM contexts WHERE user_id = %s ORDER BY id DESC LIMIT 1", 
-        (user_id,)#just user_id send it as a single integer but with comma it becomes a tuple and MySQL expects parameters to be in a list, tuple, or dictionary format.
+    question = q.question
+    user_id = q.user_id
+
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT id, context FROM contexts WHERE user_id = %s ORDER BY id DESC LIMIT 1",
+        (user_id,),
     )
-     
-     context = cursor.fetchone()
-     if not context:
+
+    context = cursor.fetchone()
+    if not context:
         return {"error": "No document uploaded yet."}
-     
-     cursor.execute(" SELECT sender, text FROM messages WHERE user_id = %s ORDER BY timestamp DESC LIMIT 6", (user_id,))
-     rows = cursor.fetchall()
-     bubbles = []
-     current = {}
-     
-     for sender, text in reversed(rows):
+
+    cursor.execute(
+        "SELECT sender, text FROM messages WHERE user_id = %s ORDER BY timestamp DESC LIMIT 6",
+        (user_id,),
+    )
+    rows = cursor.fetchall()
+    bubbles = []
+    current = {}
+
+    for sender, text in reversed(rows):
         if sender == "user":
             current["question"] = text
         elif sender == "ai":
             current["answer"] = text
-        
+
         if "question" in current and "answer" in current:
             bubbles.append(current)
             current = {}
             if len(bubbles) >= 3:
                 break
-    
-     bubble_text = "\n\n".join(
-    [f"Previous Q: {b['question']}\nPrevious A: {b['answer']}" for b in bubbles])
-     
-     final_prompt = f"Context: {context}\n\nPrevious chat: {bubble_text}\n\nQuestion:{question}"
-            
 
-     data ={
-         "contents":[
-             {
-                 "parts":[
-                     {"text": final_prompt}
-                 ]
-             }
-         ]
-     }
-     
-     headers = {"Content-Type": "application/json"}
-     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-     
-     async with httpx.AsyncClient(timeout=timeout_config) as client:
-            try:
-                response = await client.post(url, headers=headers, json=data)
-            except httpx.RequestError as exc:
-                return {"error": f"Request failed: {exc}"}
-            except httpx.TimeoutException:
-                return {"error": "The request timed out. Please try again."}
-            if response.status_code != 200:
-                return {"error": "Failed to summarize", "details": response.text}
-            res_json = response.json()
-            answer_text = res_json.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No answer available")
-            cursor.execute("INSERT INTO messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, question, "user"))
-            cursor.execute("INSERT INTO messages (user_id, text, sender) VALUES (%s, %s, %s)",(user_id, answer_text, "ai"))
-            db.commit()
+    bubble_text = "\n\n".join([f"Previous Q: {b['question']}\nPrevious A: {b['answer']}" for b in bubbles])
 
-            return {"answer": answer_text}
+    final_prompt = f"Context: {context}\n\nPrevious chat: {bubble_text}\n\nQuestion:{question}"
+
+    data = {"contents": [{"parts": [{"text": final_prompt}]}]}
+
+    headers = {"Content-Type": "application/json"}
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+
+    async with httpx.AsyncClient(timeout=timeout_config) as client:
+        try:
+            response = await client.post(url, headers=headers, json=data)
+        except httpx.RequestError as exc:
+            raise HTTPException(status_code=500, detail=f"Request failed: {exc}")
+        except httpx.TimeoutException:
+            raise HTTPException(status_code=504, detail="The request timed out. Please try again.")
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail={"Failed to summarize": response.text})
+
+        res_json = response.json()
+        answer_text = (
+            res_json
+            .get("candidates", [{}])[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("text", "No answer available")
+        )
+
+        cursor.execute(
+            "INSERT INTO messages (user_id, text, sender) VALUES (%s, %s, %s)",
+            (user_id, question, "user"),
+        )
+        cursor.execute(
+            "INSERT INTO messages (user_id, text, sender) VALUES (%s, %s, %s)",
+            (user_id, answer_text, "ai"),
+        )
+        db.commit()
+
+        return {"answer": answer_text}
      

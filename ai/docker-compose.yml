@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: doc_summarizer_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: Kh53ghdj@
+      MYSQL_DATABASE: doc_summarizer
+      MYSQL_USER: doc_user
+      MYSQL_PASSWORD: doc_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - $HOME/doc_summarizer_init:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:
